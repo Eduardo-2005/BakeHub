@@ -1,1 +1,2 @@
-export * from "./Layouts"
+export * from "./AdminLayout";
+export * from "./ClienteLayout";
