@@ -1,11 +1,11 @@
-import { BrowserRouter as Router } from "react-router-dom"
+import { BrowserRouter, BrowserRouter as Router } from "react-router-dom"
 import Rutas from "./routes/Rutas"
 
 function App() {
     return (
-        <Router>
+        <BrowserRouter>
             <Rutas />
-        </Router>
+        </BrowserRouter>
     );       
 }
 

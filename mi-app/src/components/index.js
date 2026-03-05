@@ -1,3 +1,3 @@
-export * from "./operacion"
+export * from "./productos"
 export * from "./form"
 export * from "./menu"

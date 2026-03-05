@@ -1,25 +1,23 @@
 import React from "react"
 import {Routes, Route} from "react-router-dom";
-import {Home, Gestion, Resultados, Dashoard} from "../pages"
-import {} from "../layouts"
+import {ListProductos, FormProductos} from "../pages/productos"
+import {Home} from "../pages"
+import {Layout} from "../layouts"
 
 
 function Rutas() {
 
-const Layout = (Layout, pages) => {
-    return (
+const plantillas = (Layout, Page) => (
         <Layout>
-            <pages/>
+            <Page />
         </Layout>
-    )
-}
+    );
+
     return (
         <Routes>
-            <Route path="/" element={LoadLayout=(AdminLayouts, Dashoard)}/>
-            <Route path="/" element={<Dashoard/>}/>
-            <Route path="/home" element={<Home/>}/>
-            <Route path="/gestion" element={<Gestion/>}/>
-            <Route path="/resultados" element={<Resultados/>}/>
+            <Route path="/" element={plantillas(Layout, Home)}/>
+            <Route path="/productos" element={plantillas(Layout, ListProductos)}/>
+            <Route path="/productos/form" element={plantillas(Layout, FormProductos)}/>
         </Routes>
     )
      
