@@ -1,92 +1,34 @@
-import React, { Children } from "react";
-import { Link } from "react-router-dom";
+import{NavLink} from "react-router";
+import {LayoutDashboard, Home, Settings, X} from "lucide-react";
 
-export function Menu() {
+export function MenuLateral({isOpen, toggleSidebar}) {
+
+  const menuItems=[
+    {name: "Dashoboard",path:"/", icon:<LayoutDashboard size={20}/>},
+    {name: "Home",path:"/home", icon:<Home size={20}/>},
+    {name: "Gestion",path:"/gestion", icon:<Settings size={20}/>}
+  ]
+
   return (
-    <nav className="navbar bg-body-tertiary fixed-top">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
-          offcanvas navbar
-        </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasNavbar"
-          aria-controls="offcanvasNavbar"
-          aria-label="Toggle navigation"
+<aside className={`fixed inset-y-0 left-0 z-50 bg-slate-900 w-64 text-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${isOpen ? 'translate-x-0':'-translate-x-full'}`}>
+  <div className="p-6 border-b border-slate-800 flex justify-between items-center">
+    <h1 className="text-xl font-bold tracking-tight">Nombre empresa</h1>
+    <button onClick={toggleSidebar} className="lg:hidden text-slate-400"><X size={24}/></button>
+  </div>
+  <nav className="flex-1 p-4 mt-4 space-y-2">
+    {
+      menuItems.map((menuitem)=>(
+        <NavLink key={menuitem.name} to={menuitem.path}
+        onClick={()=>{if (window.innerWidth<1024) toggleSidebar()}}
+        className={({isActive})=>`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${isActive ? 'bg-blue-600 text-white shadow-lg':'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
         >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div
-          className="offcanvas offcanvas-end"
-          tabIndex="-1"
-          id="offcanvasNavbar"
-          aria-labelledby="offcanvasNavbarLabel"
-        >
-          <div className="offcanvas-header">
-            <h5 className="offcanvas-title" id="offcanvasNavbarLabel">
-              offcanvas
-            </h5>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div className="offcanvas-body">
-            <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
-              <li className="nav-item">
-                <Link className="nav-link active" aria-current="page" to="/">
-                  Home
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/productos">
-                  Productos
-                </Link>
-              </li>
-              <li className="nav-item">
-                <a 
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"                
-                >
-                  Categorias
-                </a>
-                <ul className="dropdown-menu">
-                  <li>
-                    <Link className="dropdown-item" to="/Postres">
-                      Postres
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/Bebidas">
-                      Bebidas
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-            <form className="d-flex mt-3" role="search">
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              />
-              <button className="btn btn-outline-success" type="submit">
-                Search
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </nav>
+          {menuitem.icon}
+          <span className="font-medium">{menuitem.name}</span>
+        </NavLink>
+      ))
+    }
+  </nav>
+</aside>
+  
   );
 }
-
-export default Menu;

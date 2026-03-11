@@ -1,12 +1,14 @@
-import { BrowserRouter, BrowserRouter as Router } from "react-router-dom"
-import Rutas from "./routes/Rutas"
+import { Camera } from 'lucide-react'
+import { useState } from 'react'
 
 function App() {
-    return (
-        <BrowserRouter>
-            <Rutas />
-        </BrowserRouter>
-    );       
+  return (
+    <div className="min-h-screen bg-blue-500 flex items-center justify-center">
+      <h1 className="text-4xl font-bold text-white">
+        BakeHub 🍞
+      </h1>
+    </div>
+  )
 }
 
-export default App;
+export default App
