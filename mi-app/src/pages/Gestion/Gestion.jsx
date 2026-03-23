@@ -7,7 +7,7 @@ export function Gestion() {
   const nombre = location.state?.nombre || "Estudiante";
   const respuesta=location.state?.estudiarSistemas;
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-500 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-600 via-indigo-600 to-blue-500 relative overflow-hidden">
 
       {/* Fondo animado decorativo */}
       <div className="absolute w-72 h-72 bg-pink-400 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse top-10 left-10"></div>
