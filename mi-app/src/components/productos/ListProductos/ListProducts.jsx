@@ -1,9 +1,26 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import clienteAxios from "../../../services/Axios";
 import { Stack, Row, Col } from "react-bootstrap";
 import { ItemProductos } from "../ItemProductos";
 import { Productos } from "../../../utils";
 
 import "./ListProductos.scss";
+
+const ListProductos = () => {
+  const [productos, setProductos] = useState([]);
+
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const res = await clienteAxios.get("/productos");
+        setProductos(res.data);
+      } catch (err) {
+        console.error("Error al traer productos", err);
+      }
+    };
+    fetchProductos();
+  }, []);
+}
 
 export function ListProductos() {
   return (

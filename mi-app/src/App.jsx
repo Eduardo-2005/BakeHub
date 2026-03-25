@@ -1,5 +1,5 @@
-import { Camera } from 'lucide-react'
-import { useState } from 'react'
+import { Camera } from 'lucide-react';
+import { useState } from 'react';
 
 function App() {
   return (

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import clienteAxios from "../../../services/Axios";
 import { Button, Col, Form, InputGroup, Row, Modal } from "react-bootstrap";
 /* import { initialValues, validationSchema } from "./FormProductos.form";
 import { useFormik } from "formik"; */
@@ -6,6 +7,15 @@ import { Producto } from "../../../api";
 import { TableProducts } from "../TableProducts";
 import { FormEdit } from "../FormEdit";
 
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await clienteAxios.post("/productos", { nombre: "Pastel", precio: 250 });
+    alert("Producto guardado con exito");
+  } catch (err) {
+    alert("Hubo un error al guardar");
+  }
+};
 
 const ctrProducto = new Producto();
 
