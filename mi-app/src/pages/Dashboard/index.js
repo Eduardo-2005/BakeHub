@@ -1,1 +1,1 @@
-export * from "./Dashoard";
+export * from "./Dashoard.jsx";

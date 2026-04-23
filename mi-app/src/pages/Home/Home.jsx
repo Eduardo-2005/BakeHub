@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router";
+import {useNavigate} from "react-router";
 
 export function Home() {
   const initValue = {
@@ -12,17 +12,24 @@ export function Home() {
     gustos: [],
     estudiarSistemas: null,
   };
-
   const [formData, setFormData] = useState(initValue);
-  const navigate = useNavigate();
+
+  const navigate=useNavigate();
 
   const gustosOpciones = [
-    "Programación", "Videojuegos", "Robótica", 
-    "Diseño Web", "Inteligencia Artificial", "Ciberseguridad",
+    "Programación",
+    "Videojuegos",
+    "Robótica",
+    "Diseño Web",
+    "Inteligencia Artificial",
+    "Ciberseguridad",
   ];
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const toggleGusto = (gusto) => {
@@ -37,57 +44,52 @@ export function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Nota: Cambiado a http para evitar errores de certificado local
       const { data } = await axios.post(
-        "http://localhost:4000/api/interesado/create",
-        formData
+        "https://localhost:4000/api/interesado/create",
+        formData,
       );
 
       if (data.ok) {
         Swal.fire({
           position: "top-end",
           icon: "success",
-          title: data.message || "Información enviada",
+          title: data.message,
           showConfirmButton: false,
           timer: 1500,
         });
-        
-        // Ejecutamos navegación y reset
-        handleNavigationAndReset();
       }
+      initialValues();
     } catch (error) {
-      const errorMsg = error.response?.data?.message || "Error al enviar la información";
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: errorMsg,
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      if (!error.response.data.ok) {
+        return Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: error.response.data.message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+
+      console.error(error);
     }
   };
 
-  const handleNavigationAndReset = () => {
-    // 1. Navegar con los datos actuales
-    navigate("/gestion", { 
-      state: { 
-        nombre: formData.nombre, 
-        estudiarSistemas: formData.estudiarSistemas 
-      }
-    });
-    // 2. Resetear el formulario
-    setFormData(initValue);
-  };
+  const initialValues=()=>{
+    setFormData(initialValues);
+      navigate("/gestion",{ state: { nombre: formData.nombre, estudiarSistemas:formData.estudiarSistemas }});
+  }
 
   const progreso = () => {
-    const total = 6;
+    let total = 6;
     let completos = 0;
+
     if (formData.nombre) completos++;
     if (formData.escuela) completos++;
     if (formData.email) completos++;
     if (formData.telefono) completos++;
     if (formData.gustos.length > 0) completos++;
     if (formData.estudiarSistemas !== null) completos++;
+
     return (completos / total) * 100;
   };
 
@@ -101,6 +103,7 @@ export function Home() {
           Formulario de Interés Académico
         </h2>
 
+        {/* Barra de progreso */}
         <div className="w-full bg-gray-200 rounded-full h-3">
           <div
             className="bg-indigo-500 h-3 rounded-full transition-all duration-500"
@@ -108,47 +111,51 @@ export function Home() {
           ></div>
         </div>
 
-        <div className="space-y-4">
-          <input
-            type="text"
-            name="nombre"
-            placeholder="Nombre completo"
-            value={formData.nombre}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition"
-            required
-          />
-          <input
-            type="text"
-            name="escuela"
-            placeholder="Escuela de procedencia"
-            value={formData.escuela}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Correo electrónico"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition"
-            required
-          />
-          <input
-            type="tel"
-            name="telefono"
-            placeholder="Número de teléfono"
-            value={formData.telefono}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition"
-            required
-          />
-        </div>
+        {/* Nombre */}
+        <input
+          type="text"
+          name="nombre"
+          placeholder="Nombre completo"
+          value={formData.nombre}
+          onChange={handleChange}
+          className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition"
+        />
 
+        {/* Escuela */}
+        <input
+          type="text"
+          name="escuela"
+          placeholder="Escuela de procedencia"
+          value={formData.escuela}
+          onChange={handleChange}
+          className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition"
+        />
+
+        {/* Email */}
+        <input
+          type="email"
+          name="email"
+          placeholder="Correo electrónico"
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition"
+        />
+
+        {/* Teléfono */}
+        <input
+          type="tel"
+          name="telefono"
+          placeholder="Número de teléfono"
+          value={formData.telefono}
+          onChange={handleChange}
+          className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition"
+        />
+
+        {/* Gustos */}
         <div>
-          <p className="font-semibold text-gray-700 mb-2">¿Cuáles son tus intereses?</p>
+          <p className="font-semibold text-gray-700 mb-2">
+            ¿Cuáles son tus intereses?
+          </p>
           <div className="flex flex-wrap gap-2">
             {gustosOpciones.map((gusto) => (
               <button
@@ -167,23 +174,34 @@ export function Home() {
           </div>
         </div>
 
+        {/* Pregunta Sistemas */}
         <div>
-          <p className="font-semibold text-gray-700 mb-2">¿Te gustaría estudiar Sistemas Computacionales?</p>
+          <p className="font-semibold text-gray-700 mb-2">
+            ¿Te gustaría estudiar Sistemas Computacionales?
+          </p>
           <div className="flex gap-4">
             <button
               type="button"
-              onClick={() => setFormData({ ...formData, estudiarSistemas: true })}
+              onClick={() =>
+                setFormData({ ...formData, estudiarSistemas: true })
+              }
               className={`flex-1 py-2 rounded-xl transition ${
-                formData.estudiarSistemas === true ? "bg-green-500 text-white" : "bg-gray-200 hover:bg-green-200"
+                formData.estudiarSistemas === true
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-200 hover:bg-green-200"
               }`}
             >
               Sí
             </button>
             <button
               type="button"
-              onClick={() => setFormData({ ...formData, estudiarSistemas: false })}
+              onClick={() =>
+                setFormData({ ...formData, estudiarSistemas: false })
+              }
               className={`flex-1 py-2 rounded-xl transition ${
-                formData.estudiarSistemas === false ? "bg-red-500 text-white" : "bg-gray-200 hover:bg-red-200"
+                formData.estudiarSistemas === false
+                  ? "bg-red-500 text-white"
+                  : "bg-gray-200 hover:bg-red-200"
               }`}
             >
               No
@@ -191,9 +209,10 @@ export function Home() {
           </div>
         </div>
 
+        {/* Botón enviar */}
         <button
           type="submit"
-          className="w-full bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 font-bold"
+          className="w-full bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105"
         >
           Enviar Información
         </button>
