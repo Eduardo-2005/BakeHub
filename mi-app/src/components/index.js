@@ -1,4 +1,4 @@
 export * from './form'
 export * from './menu'
-
-export * from './persona'
+export * from './productos'
+export * from './Persona'

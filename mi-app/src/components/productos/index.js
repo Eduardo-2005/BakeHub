@@ -1,3 +1,3 @@
-export * from "./ListProductos";
-export * from "./FormProductos";
-export * from "./FormEdit";
+export * from "./Producto";
+export * from "./FormProducto";
+export * from "./ProductCard";

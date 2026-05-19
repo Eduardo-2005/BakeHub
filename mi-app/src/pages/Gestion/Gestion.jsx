@@ -1,68 +1,195 @@
-import { useLocation, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import { FormProducto } from "../../components";
+import DatosBD from "../../service/ApiDatos";
 
 export function Gestion() {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [productos, setProductos] = useState([]);
+  const [cargando, setCargando] = useState(true);
 
-  const nombre = location.state?.nombre || "Estudiante";
-  const respuesta=location.state?.estudiarSistemas;
+  const obtenerIdProducto = (producto) => {
+    return producto.id || producto._id;
+  };
+
+  const obtenerProductos = async () => {
+    try {
+      const respuesta = await DatosBD.getProductos();
+
+      if (respuesta.data.ok) {
+        setProductos(respuesta.data.productos);
+      }
+    } catch (error) {
+      console.log(error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudieron cargar los productos.",
+      });
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => {
+    obtenerProductos();
+  }, []);
+
+  const agregarProducto = async (nuevoProducto) => {
+    try {
+      const productoParaEnviar = {
+        nombre: nuevoProducto.nombre,
+        descripcion: nuevoProducto.descripcion,
+        precio: nuevoProducto.precio,
+        categoria: nuevoProducto.categoria,
+        imagen: nuevoProducto.imagen,
+        disponible: nuevoProducto.disponible,
+      };
+
+      const respuesta = await DatosBD.postProducto(productoParaEnviar);
+
+      if (respuesta.data.ok) {
+        setProductos([respuesta.data.producto, ...productos]);
+
+        Swal.fire({
+          icon: "success",
+          title: "Producto agregado",
+          text: respuesta.data.message,
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo guardar el producto en la base de datos.",
+      });
+    }
+  };
+
+  const eliminarProducto = async (idProducto) => {
+    try {
+      const respuesta = await DatosBD.deleteProducto(idProducto);
+
+      if (respuesta.data.ok) {
+        const productosActualizados = productos.filter(
+          (producto) => obtenerIdProducto(producto) !== idProducto
+        );
+
+        setProductos(productosActualizados);
+
+        Swal.fire({
+          icon: "success",
+          title: "Producto eliminado",
+          text: respuesta.data.message,
+          timer: 1200,
+          showConfirmButton: false,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo eliminar el producto.",
+      });
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-600 via-indigo-600 to-blue-500 relative overflow-hidden">
-
-      {/* Fondo animado decorativo */}
-      <div className="absolute w-72 h-72 bg-pink-400 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse top-10 left-10"></div>
-      <div className="absolute w-72 h-72 bg-yellow-400 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse bottom-10 right-10"></div>
-
-      <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center transform transition-all duration-500 hover:scale-105">
-        
-        <h1 className="text-4xl font-extrabold text-indigo-600 mb-4 animate-bounce">
-          🎉 ¡Gracias!
+    <div className="space-y-6">
+      <section className="bg-white shadow-md rounded-2xl p-5">
+        <h1 className="text-3xl font-bold text-pink-700">
+          Gestión de productos
         </h1>
 
-        <p className="text-lg text-gray-700 mb-4">
-          <span className="font-bold text-indigo-700">{nombre}</span>, tu información fue enviada correctamente.
+        <p className="text-gray-600">
+          Administra los productos que aparecerán en el menú digital.
         </p>
-{
-  respuesta===true?(<>
-      <h1 className="text-4xl font-extrabold text-indigo-600 mb-4 animate-bounce">
-        🎉 ¡Excelente decisión!
-      </h1>
-      <p className="text-lg text-gray-700 mb-4">
-        <span className="font-bold text-indigo-700">{nombre}</span>, estamos emocionados de que quieras formar parte del mundo de los Sistemas Computacionales 💻✨
-      </p>
-      <p className="text-gray-600 mb-6">
-        Prepárate para innovar, crear y transformar el futuro 🚀
-      </p>
-    </>):(<>
-      <h1 className="text-4xl font-extrabold text-purple-600 mb-4">
-        🙌 ¡Gracias por tu sinceridad!
-      </h1>
-      <p className="text-lg text-gray-700 mb-4">
-        <span className="font-bold text-purple-700">{nombre}</span>, apreciamos mucho que hayas compartido tu opinión.
-      </p>
-      <p className="text-gray-600 mb-6">
-        Aunque hoy no estés pensando en Sistemas Computacionales, recuerda que la tecnología está presente en todas las áreas 🌎💡  
-        Siempre será una herramienta poderosa sin importar la carrera que elijas.
-      </p>
-      <p className="text-indigo-600 font-semibold mb-6">
-        ¡Te deseamos mucho éxito en tu camino académico! 🚀
-      </p>
-    </>)
-}
-        
+      </section>
 
-        <div className="text-5xl mb-6">
-          🚀💡🤖
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <section>
+          <FormProducto onAgregarProducto={agregarProducto} />
+        </section>
 
-        <button
-          onClick={() => navigate("/")}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-full hover:bg-indigo-700 transition-all duration-300 transform hover:scale-110 shadow-lg"
-        >
-          Volver al Inicio
-        </button>
+        <section className="bg-white rounded-2xl shadow-md p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-5">
+            Lista de productos
+          </h2>
 
+          {cargando ? (
+            <p className="text-gray-500">Cargando productos...</p>
+          ) : productos.length === 0 ? (
+            <p className="text-gray-500">
+              Aún no has agregado productos.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {productos.map((producto) => (
+                <article
+                  key={obtenerIdProducto(producto)}
+                  className="border rounded-2xl p-4 flex flex-col sm:flex-row gap-4"
+                >
+                  <img
+                    src={
+                      producto.imagen ||
+                      "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500"
+                    }
+                    alt={producto.nombre}
+                    className="w-full sm:w-28 h-28 object-cover rounded-xl"
+                  />
+
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start gap-3">
+                      <h3 className="text-xl font-bold text-gray-800">
+                        {producto.nombre}
+                      </h3>
+
+                      <span className="text-sm bg-pink-100 text-pink-700 px-3 py-1 rounded-full">
+                        {producto.categoria}
+                      </span>
+                    </div>
+
+                    <p className="text-gray-600 text-sm mt-2">
+                      {producto.descripcion}
+                    </p>
+
+                    <p className="text-pink-700 font-bold mt-2">
+                      ${producto.precio}
+                    </p>
+
+                    <p
+                      className={`text-sm font-semibold ${
+                        producto.disponible
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {producto.disponible
+                        ? "Disponible"
+                        : "No disponible"}
+                    </p>
+
+                    <button
+                      onClick={() =>
+                        eliminarProducto(obtenerIdProducto(producto))
+                      }
+                      className="mt-3 bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transition"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </div>
-  )
+  );
 }
