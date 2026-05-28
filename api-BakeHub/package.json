@@ -1,0 +1,27 @@
+{
+  "name": "api-bakehub",
+  "version": "1.0.0",
+  "description": "son las peticiones http para appmovil",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cors",
+    "express",
+    "nodemon",
+    "path",
+    "mongoose"
+  ],
+  "author": "Ghost King",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mongoose": "^9.3.1",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
