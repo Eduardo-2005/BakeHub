@@ -1,4 +1,5 @@
-import api from "../Api/connectionAxios";
+import api from "../api/connectionAxios";
+
 
 class DatosBD {
   async getProductos() {

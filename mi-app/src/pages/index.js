@@ -1,4 +1,3 @@
-export * from "./Home";
-
-export * from "./Gestion";
-export * from "./Resultados";
+export * from "./Home/Home";
+export * from "./Gestion/Gestion";
+export * from "./Resultados/Resultados";

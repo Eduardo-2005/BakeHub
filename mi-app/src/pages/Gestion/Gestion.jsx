@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { FormProducto } from "../../components";
-import DatosBD from "../../service/ApiDatos";
+import DatosBD from "../../service/apiDatos";
 
 export function Gestion() {
   const [productos, setProductos] = useState([]);

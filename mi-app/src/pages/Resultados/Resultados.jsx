@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Swal } from "sweetalert2";
+import Swal from "sweetalert2";
 import { Producto } from "../../components";
-import { DatosBD } from "../../services";
+import DatosBD from "../../service/apiDatos";
 
 export function Resultados() {
   const navigate = useNavigate();

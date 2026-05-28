@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ProductCard } from "../../components/producto";
-import DatosBD from "../../service/ApiDatos";
+import { ProductCard } from "../../components/productos";
+import DatosBD from "../../service/apiDatos";
 
 export function Home() {
   const navigate = useNavigate();
