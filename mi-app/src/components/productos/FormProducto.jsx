@@ -15,7 +15,7 @@ export function FormProducto({ onAgregarProducto }) {
   const [producto, setProducto] = useState(productoInicial);
   const [cargando, setCargando] = useState(false);
 
-  const categorias = [
+  const categories = [
     "Pasteles",
     "Cupcakes",
     "Waffles",
@@ -25,7 +25,6 @@ export function FormProducto({ onAgregarProducto }) {
 
   const manejarCambio = (e) => {
     const { name, value, type, checked } = e.target;
-
     setProducto({
       ...producto,
       [name]: type === "checkbox" ? checked : value,
@@ -46,7 +45,6 @@ export function FormProducto({ onAgregarProducto }) {
         title: "Campos incompletos",
         text: "Debe llenar todos los campos obligatorios.",
       });
-
       return;
     }
 
@@ -56,12 +54,10 @@ export function FormProducto({ onAgregarProducto }) {
         title: "Precio inválido",
         text: "El precio debe ser mayor a 0.",
       });
-
       return;
     }
 
     const nuevoProducto = {
-      id: Date.now(),
       ...producto,
       precio: Number(producto.precio),
     };
@@ -69,26 +65,36 @@ export function FormProducto({ onAgregarProducto }) {
     setCargando(true);
 
     try {
-      const response = await DatosBD.postProducto(nuevoProducto);
+      // 1. Enviamos el producto a la base de datos
+      const respuesta = await DatosBD.postProducto(nuevoProducto);
 
+      // 2. Mostramos el SweetAlert de éxito real
       Swal.fire({
         icon: "success",
-        title: "Producto agregado",
-        text: "El producto ha sido agregado exitosamente.",
+        title: "¡Producto guardado!",
+        text: "El producto se registró correctamente en la base de datos.",
+        timer: 2000,
+        showConfirmButton: false
       });
 
-      if (onAgregarProducto) {
-        onAgregarProducto(response.data);
+      // 3. Limpiamos el formulario
+      setProducto(productoInicial);
+
+      // 4. Mandamos el producto al componente padre sin arruinar el SweetAlert
+      if (onAgregarProducto && respuesta.data && respuesta.data.ok) {
+        try {
+          onAgregarProducto(respuesta.data.producto);
+        } catch (errorPadre) {
+          console.error("Error al actualizar visualmente la lista en el componente padre:", errorPadre);
+        }
       }
 
-      setProducto(productoInicial);
     } catch (error) {
-      console.error("Error al guardar en BD:", error.response || error.message);
-
+      console.error("Error real al guardar en BD:", error.response?.data || error.message);
       Swal.fire({
         icon: "error",
-        title: "Error al guardar",
-        text: "Hubo un error al guardar el producto. Por favor, intenta nuevamente.",
+        title: "Error",
+        text: "No se pudo guardar el producto en la base de datos.",
       });
     } finally {
       setCargando(false);
@@ -108,7 +114,6 @@ export function FormProducto({ onAgregarProducto }) {
         <label className="block font-semibold text-gray-700 mb-1">
           Nombre del producto
         </label>
-
         <input
           type="text"
           name="nombre"
@@ -124,7 +129,6 @@ export function FormProducto({ onAgregarProducto }) {
         <label className="block font-semibold text-gray-700 mb-1">
           Descripción
         </label>
-
         <textarea
           name="descripcion"
           placeholder="Describe el producto, ingredientes o sabor..."
@@ -139,7 +143,6 @@ export function FormProducto({ onAgregarProducto }) {
         <label className="block font-semibold text-gray-700 mb-1">
           Precio
         </label>
-
         <input
           type="number"
           name="precio"
@@ -156,7 +159,6 @@ export function FormProducto({ onAgregarProducto }) {
         <label className="block font-semibold text-gray-700 mb-1">
           Categoría
         </label>
-
         <select
           name="categoria"
           value={producto.categoria}
@@ -165,8 +167,7 @@ export function FormProducto({ onAgregarProducto }) {
           disabled={cargando}
         >
           <option value="">Selecciona una categoría</option>
-
-          {categorias.map((categoria) => (
+          {categories.map((categoria) => (
             <option key={categoria} value={categoria}>
               {categoria}
             </option>
@@ -178,7 +179,6 @@ export function FormProducto({ onAgregarProducto }) {
         <label className="block font-semibold text-gray-700 mb-1">
           URL de imagen
         </label>
-
         <input
           type="text"
           name="imagen"
@@ -190,13 +190,14 @@ export function FormProducto({ onAgregarProducto }) {
         />
       </div>
 
-      <label className="flex items-center gap-3 text-gray-700 font-semibold">
+      <label className="flex items-center gap-3 text-gray-700 font-semibold cursor-pointer">
         <input
           type="checkbox"
+          id="disponible"
           name="disponible"
           checked={producto.disponible}
           onChange={manejarCambio}
-          className="w-5 h-5"
+          className="w-5 h-5 accent-pink-600"
           disabled={cargando}
         />
         Producto disponible
@@ -204,11 +205,11 @@ export function FormProducto({ onAgregarProducto }) {
 
       <button
         type="submit"
-        className="w-full bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition"
-        
+        className="w-full bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition font-bold"
+        disabled={cargando}
       >
-        Agregar producto
+        {cargando ? "Guardando..." : "Agregar producto"}
       </button>
     </form>
   );
-};
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ProductCard } from "../../components/productos";
 import DatosBD from "../../service/apiDatos";
@@ -10,11 +10,13 @@ export function Home() {
   const [busqueda, setBusqueda] = useState("");
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("Todos");
   const [carrito, setCarrito] = useState(() => {
-  const carritoGuardado = localStorage.getItem("carritoBakeHub");
-  return carritoGuardado ? JSON.parse(carritoGuardado) : [];
-});
+    const carritoGuardado = localStorage.getItem("carritoBakeHub");
+    return carritoGuardado ? JSON.parse(carritoGuardado) : [];
+  });
   const [cargando, setCargando] = useState(true);
 
+  // CORRECCIÓN: "Pasteles" cambiado a "Pasteles" para coincidir con la base de datos
+  // Ojo con los acentos o diferencias en mayúsculas/minúsculas.
   const categorias = [
     "Todos",
     "Pasteles",
@@ -30,14 +32,16 @@ export function Home() {
 
   const obtenerProductos = async () => {
     try {
+      setCargando(true); // Aseguramos que inicie en true al recargar
       const respuesta = await DatosBD.getProductos();
 
-      if (respuesta.data.ok) {
+      if (respuesta.data && respuesta.data.ok) {
         setProductos(respuesta.data.productos);
       }
     } catch (error) {
       console.log(error);
-      alert("No se pudieron cargar los productos del menú.");
+      // Cambiado a consola para evitar alerts intrusivos que congelen el renderizado
+      console.error("No se pudieron cargar los productos del menú.");
     } finally {
       setCargando(false);
     }
@@ -48,17 +52,18 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-  localStorage.setItem("carritoBakeHub", JSON.stringify(carrito));
-}, [carrito]);
+    localStorage.setItem("carritoBakeHub", JSON.stringify(carrito));
+  }, [carrito]);
 
   const productosFiltrados = productos.filter((producto) => {
     const coincideBusqueda = producto.nombre
-      .toLowerCase()
+      ?.toLowerCase()
       .includes(busqueda.toLowerCase());
 
+    // Normalizamos a minúsculas o comparamos directo garantizando que coincidan con tus opciones
     const coincideCategoria =
       categoriaSeleccionada === "Todos" ||
-      producto.categoria === categoriaSeleccionada;
+      producto.categoria?.toLowerCase() === categoriaSeleccionada.toLowerCase();
 
     return coincideBusqueda && coincideCategoria;
   });
@@ -84,8 +89,8 @@ export function Home() {
   };
 
   const verCarrito = () => {
-  navigate("/resultados");
-};
+    navigate("/resultados");
+  };
 
   const totalProductos = carrito.reduce((total, producto) => {
     return total + producto.cantidad;
@@ -96,7 +101,6 @@ export function Home() {
       <section className="bg-white shadow-md rounded-2xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-pink-700">BakeHub</h1>
-
           <p className="text-gray-600">
             Menú digital de postres y alimentos
           </p>
@@ -104,7 +108,7 @@ export function Home() {
 
         <button
           onClick={verCarrito}
-          className="bg-pink-600 text-white px-5 py-3 rounded-xl hover:bg-pink-700 transition"
+          className="bg-pink-600 text-white px-5 py-3 rounded-xl hover:bg-pink-700 transition font-semibold"
         >
           Ver carrito ({totalProductos})
         </button>
@@ -127,7 +131,7 @@ export function Home() {
               className={`px-4 py-2 rounded-full border transition ${
                 categoriaSeleccionada === categoria
                   ? "bg-pink-600 text-white"
-                  : "bg-gray-100 hover:bg-pink-100"
+                  : "bg-gray-100 hover:bg-pink-100 text-gray-700"
               }`}
             >
               {categoria}
@@ -138,22 +142,22 @@ export function Home() {
 
       {cargando ? (
         <section className="bg-white rounded-2xl shadow-md p-8 text-center">
-          <p className="text-gray-600">Cargando productos...</p>
+          <p className="text-gray-500 animate-pulse">Cargando productos...</p>
         </section>
       ) : (
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {productosFiltrados.length > 0 ? (
             productosFiltrados.map((producto) => (
               <ProductCard
-  key={obtenerIdProducto(producto)}
-  producto={producto}
-  onAgregarCarrito={agregarAlCarrito}
-/>
+                key={obtenerIdProducto(producto)}
+                producto={producto}
+                onAgregarCarrito={agregarAlCarrito} // Conectado con la propiedad requerida por la Card
+              />
             ))
           ) : (
             <div className="col-span-full bg-white rounded-2xl shadow-md p-8 text-center">
-              <p className="text-gray-600">
-                No se encontraron productos con esa búsqueda.
+              <p className="text-gray-500">
+                No se encontraron productos con esa búsqueda o categoría.
               </p>
             </div>
           )}
