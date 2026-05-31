@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { FormProducto } from "../../components";
+import { ProductCard } from "../../components/productos";
 import DatosBD from "../../service/apiDatos";
+
 
 export function Gestion() {
   const [productos, setProductos] = useState([]);
@@ -13,21 +15,26 @@ export function Gestion() {
 
   const obtenerProductos = async () => {
     try {
+      setCargando(true);
       const respuesta = await DatosBD.getProductos();
 
-      if (respuesta.data.ok) {
+      if (respuesta.data && respuesta.data.ok) {
+        setProductos(respuesta.data.productos || []);
+      } else if (Array.isArray(respuesta.data)) {
+        setProductos(respuesta.data);
+      } else if (respuesta.data && respuesta.data.productos) {
         setProductos(respuesta.data.productos);
       }
     } catch (error) {
       console.log(error);
-
       Swal.fire({
         icon: "error",
         title: "Error",
         text: "No se pudieron cargar los productos.",
       });
+      setProductos([]); // Evita que se quede congelado si falla la API
     } finally {
-      setCargando(false);
+      setCargando(false); // IMPORTANTE: Apaga el "Cargando..." pase lo que pase
     }
   };
 
@@ -61,7 +68,6 @@ export function Gestion() {
       }
     } catch (error) {
       console.log(error);
-
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -91,7 +97,6 @@ export function Gestion() {
       }
     } catch (error) {
       console.log(error);
-
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -106,7 +111,6 @@ export function Gestion() {
         <h1 className="text-3xl font-bold text-pink-700">
           Gestión de productos
         </h1>
-
         <p className="text-gray-600">
           Administra los productos que aparecerán en el menú digital.
         </p>
@@ -123,10 +127,10 @@ export function Gestion() {
           </h2>
 
           {cargando ? (
-            <p className="text-gray-500">Cargando productos...</p>
+            <p className="text-gray-500 animate-pulse">Cargando productos...</p>
           ) : productos.length === 0 ? (
             <p className="text-gray-500">
-              Aún no has agregado productos.
+              Aún no has agregado productos o no se encontraron en la base de datos.
             </p>
           ) : (
             <div className="space-y-4">
@@ -149,7 +153,6 @@ export function Gestion() {
                       <h3 className="text-xl font-bold text-gray-800">
                         {producto.nombre}
                       </h3>
-
                       <span className="text-sm bg-pink-100 text-pink-700 px-3 py-1 rounded-full">
                         {producto.categoria}
                       </span>
@@ -165,14 +168,10 @@ export function Gestion() {
 
                     <p
                       className={`text-sm font-semibold ${
-                        producto.disponible
-                          ? "text-green-600"
-                          : "text-red-600"
+                        producto.disponible ? "text-green-600" : "text-red-600"
                       }`}
                     >
-                      {producto.disponible
-                        ? "Disponible"
-                        : "No disponible"}
+                      {producto.disponible ? "Disponible" : "No disponible"}
                     </p>
 
                     <button

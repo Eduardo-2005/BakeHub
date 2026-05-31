@@ -1,6 +1,5 @@
 import api from "../api/connectionAxios";
 
-
 class DatosBD {
   async getProductos() {
     return await api.get("/producto/buscar");
@@ -10,12 +9,12 @@ class DatosBD {
     return await api.post("/producto/create", data);
   }
 
-  async deleteProducto(id) {
-    return await api.delete(`/producto/eliminar/${id}`);
+    async updateProducto(id, data) {
+    return await api.put(`/producto/editar/${id}`, data);
   }
 
-  async updateProducto(id, data) {
-    return await api.put(`/producto/editar/${id}`, data);
+  async deleteProducto(id) {
+    return await api.delete(`/producto/eliminar/${id}`);
   }
 
   // Guardar pedido en la BD

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
+import DatosBD from "../../service/apiDatos";
 
 export function FormProducto({ onAgregarProducto }) {
   const productoInicial = {
@@ -12,6 +13,7 @@ export function FormProducto({ onAgregarProducto }) {
   };
 
   const [producto, setProducto] = useState(productoInicial);
+  const [cargando, setCargando] = useState(false);
 
   const categorias = [
     "Pasteles",
@@ -30,7 +32,7 @@ export function FormProducto({ onAgregarProducto }) {
     });
   };
 
-  const manejarSubmit = (e) => {
+  const manejarSubmit = async (e) => {
     e.preventDefault();
 
     if (
@@ -64,8 +66,33 @@ export function FormProducto({ onAgregarProducto }) {
       precio: Number(producto.precio),
     };
 
-    onAgregarProducto(nuevoProducto);
-    setProducto(productoInicial);
+    setCargando(true);
+
+    try {
+      const response = await DatosBD.postProducto(nuevoProducto);
+
+      Swal.fire({
+        icon: "success",
+        title: "Producto agregado",
+        text: "El producto ha sido agregado exitosamente.",
+      });
+
+      if (onAgregarProducto) {
+        onAgregarProducto(response.data);
+      }
+
+      setProducto(productoInicial);
+    } catch (error) {
+      console.error("Error al guardar en BD:", error.response || error.message);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error al guardar",
+        text: "Hubo un error al guardar el producto. Por favor, intenta nuevamente.",
+      });
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
@@ -89,6 +116,7 @@ export function FormProducto({ onAgregarProducto }) {
           value={producto.nombre}
           onChange={manejarCambio}
           className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-pink-400"
+          disabled={cargando}
         />
       </div>
 
@@ -103,6 +131,7 @@ export function FormProducto({ onAgregarProducto }) {
           value={producto.descripcion}
           onChange={manejarCambio}
           className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-pink-400 min-h-28"
+          disabled={cargando}
         ></textarea>
       </div>
 
@@ -119,6 +148,7 @@ export function FormProducto({ onAgregarProducto }) {
           onChange={manejarCambio}
           min="1"
           className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-pink-400"
+          disabled={cargando}
         />
       </div>
 
@@ -132,6 +162,7 @@ export function FormProducto({ onAgregarProducto }) {
           value={producto.categoria}
           onChange={manejarCambio}
           className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-pink-400"
+          disabled={cargando}
         >
           <option value="">Selecciona una categoría</option>
 
@@ -155,6 +186,7 @@ export function FormProducto({ onAgregarProducto }) {
           value={producto.imagen}
           onChange={manejarCambio}
           className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-pink-400"
+          disabled={cargando}
         />
       </div>
 
@@ -165,6 +197,7 @@ export function FormProducto({ onAgregarProducto }) {
           checked={producto.disponible}
           onChange={manejarCambio}
           className="w-5 h-5"
+          disabled={cargando}
         />
         Producto disponible
       </label>
@@ -172,9 +205,10 @@ export function FormProducto({ onAgregarProducto }) {
       <button
         type="submit"
         className="w-full bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition"
+        
       >
         Agregar producto
       </button>
     </form>
   );
-}
+};
